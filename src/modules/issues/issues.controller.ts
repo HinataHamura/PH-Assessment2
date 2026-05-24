@@ -43,9 +43,15 @@ export async function listIssues(req: Request, res: Response, next: NextFunction
     const reporterIds = Array.from(new Set(issues.map((issue) => issue.reporter_id)));
     const reporters = await service.getUsersByIds(reporterIds);
     const reporterMap = new Map<number, Reporter>(reporters.map((reporter) => [reporter.id, reporter]));
-    const data = issues.map(({ reporter_id, ...issue }) => ({
-      ...issue,
-      reporter: reporterMap.get(reporter_id) || null,
+    const data = issues.map((issue) => ({
+      id: issue.id,
+      title: issue.title,
+      description: issue.description,
+      type: issue.type,
+      status: issue.status,
+      reporter: reporterMap.get(issue.reporter_id) || null,
+      created_at: issue.created_at,
+      updated_at: issue.updated_at,
     }));
 
     return sendSuccess(res, StatusCodes.OK, 'Issues retrived successfully', data);
@@ -61,10 +67,17 @@ export async function getIssueById(req: Request<{ id: string }>, res: Response, 
     if (!issue) throw new AppError(StatusCodes.NOT_FOUND, 'Issue not found');
 
     const reporters = await service.getUsersByIds([issue.reporter_id]);
-    const { reporter_id, ...issueData } = issue;
-    const data = { ...issueData, reporter: reporters[0] || null };
+    const data = {
+      id: issue.id,
+      title: issue.title,
+      description: issue.description,
+      type: issue.type,
+      status: issue.status,
+      reporter: reporters[0] || null,
+      created_at: issue.created_at,
+      updated_at: issue.updated_at,
+    };
 
-    void reporter_id;
     return sendSuccess(res, StatusCodes.OK, 'Issue retrived successfully', data);
   } catch (err) {
     return next(err);
