@@ -94,3 +94,10 @@ Authorization: <JWT_TOKEN>
 
 https://ph-assessment2.onrender.com
 
+
+## sample work done
+
+![image1](image.png)
+
+
+
