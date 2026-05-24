@@ -13,6 +13,14 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.get('/', (req, res) => {
+  void req;
+  res.status(StatusCodes.OK).json({
+    success: true,
+    message: 'DevPulse API is running',
+  });
+});
+
 app.use('/api/auth', authRouter);
 app.use('/api/issues', issuesRouter);
 
