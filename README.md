@@ -92,4 +92,5 @@ Authorization: <JWT_TOKEN>
 
 ## Live URL
 
-Add deployed API URL here after deployment.
+https://ph-assessment2.onrender.com
+
