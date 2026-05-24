@@ -7,7 +7,7 @@ import { sendError } from '../utils/response.util';
 
 dotenv.config();
 
-const JWT_SECRET = process.env.JWT_SECRET || 'change_this_secret';
+const JWT_SECRET = process.env.JWT_SECRET;
 
 export function authenticate(req: Request, res: Response, next: NextFunction) {
   const authHeader = req.headers.authorization;
@@ -18,6 +18,10 @@ export function authenticate(req: Request, res: Response, next: NextFunction) {
   const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : authHeader.trim();
 
   try {
+    if (!JWT_SECRET) {
+      return sendError(res, StatusCodes.UNAUTHORIZED, 'Invalid or expired token');
+    }
+
     const payload = jwt.verify(token, JWT_SECRET) as { id?: unknown; name?: unknown; role?: unknown };
     if (typeof payload.id !== 'number' || typeof payload.name !== 'string' || !isRole(payload.role)) {
       return sendError(res, StatusCodes.UNAUTHORIZED, 'Invalid or expired token');

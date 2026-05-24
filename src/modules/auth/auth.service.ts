@@ -8,7 +8,7 @@ import { AppError } from '../../utils/app-error.util';
 
 dotenv.config();
 
-const JWT_SECRET = process.env.JWT_SECRET || 'change_this_secret';
+const JWT_SECRET = process.env.JWT_SECRET;
 const SALT_ROUNDS = getSaltRounds();
 
 export async function signup(name: string, email: string, password: string, role?: Role) {
@@ -51,7 +51,17 @@ export async function login(email: string, password: string) {
   const ok = await bcrypt.compare(password, user.password);
   if (!ok) throw new AppError(StatusCodes.UNAUTHORIZED, 'Invalid email or password');
 
-  const token = jwt.sign({ id: user.id, name: user.name, role: user.role }, JWT_SECRET, { expiresIn: '6h' });
+  if (!JWT_SECRET) {
+    throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, 'JWT secret is not configured');
+  }
+
+  const payload = {
+    id: user.id,
+    name: user.name,
+    role: user.role,
+  };
+
+  const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
   const { password: _password, ...safeUser } = user;
   void _password;
 
